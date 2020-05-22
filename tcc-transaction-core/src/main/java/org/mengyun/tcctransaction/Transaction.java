@@ -93,14 +93,14 @@ public class Transaction implements Serializable {
     public void commit() {
 
         for (Participant participant : participants) {
-            participant.commit();//参与者提交
+            participant.commit();//参与者提交,执行confirm方法
         }
     }
 
     //事物回滚，依次回滚
     public void rollback() {
         for (Participant participant : participants) {
-            participant.rollback();//参与者回滚
+            participant.rollback();//参与者回滚,执行cancel方法
         }
     }
 

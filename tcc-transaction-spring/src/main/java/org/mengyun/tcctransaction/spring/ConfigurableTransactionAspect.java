@@ -8,7 +8,7 @@ import org.mengyun.tcctransaction.support.TransactionConfigurator;
 import org.springframework.core.Ordered;
 
 /**
- * Created by changmingxie on 10/30/15.
+ * Created by changmingxie on 10/30/15. 这里是不是能说明注解无法被继承，为什么呢？
  */
 @Aspect
 public class ConfigurableTransactionAspect extends CompensableTransactionAspect implements Ordered {

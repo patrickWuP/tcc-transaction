@@ -19,13 +19,13 @@ public class CompensableMethodContext {
 
     ProceedingJoinPoint pjp = null;
 
-    Method method = null;
+    Method method = null;//方法
 
-    Compensable compensable = null;
+    Compensable compensable = null;//注解
 
-    Propagation propagation = null;
+    Propagation propagation = null;//传播方式
 
-    TransactionContext transactionContext = null;
+    TransactionContext transactionContext = null;//事物上下文
 
     public CompensableMethodContext(ProceedingJoinPoint pjp) {
         this.pjp = pjp;
@@ -52,6 +52,7 @@ public class CompensableMethodContext {
         return method;
     }
 
+    //获取通过UniqueIdentity注解配置的值，没有则返回null
     public Object getUniqueIdentity() {
         Annotation[][] annotations = this.getMethod().getParameterAnnotations();
 
@@ -72,8 +73,9 @@ public class CompensableMethodContext {
 
 
     private Method getCompensableMethod() {
-        Method method = ((MethodSignature) (pjp.getSignature())).getMethod();
+        Method method = ((MethodSignature) (pjp.getSignature())).getMethod();//获取方法的特征签名（方法名称、参数顺序、参数类型），从特征签名上获取方法名称
 
+        //如果该方法没有Compensable注解，则走以下逻辑
         if (method.getAnnotation(Compensable.class) == null) {
             try {
                 method = pjp.getTarget().getClass().getMethod(method.getName(), method.getParameterTypes());
@@ -84,17 +86,19 @@ public class CompensableMethodContext {
         return method;
     }
 
+    //返回方法的角色
     public MethodRole getMethodRole(boolean isTransactionActive) {
         if ((propagation.equals(Propagation.REQUIRED) && !isTransactionActive && transactionContext == null) ||
                 propagation.equals(Propagation.REQUIRES_NEW)) {
-            return MethodRole.ROOT;
+            return MethodRole.ROOT;//为root方法角色
         } else if ((propagation.equals(Propagation.REQUIRED) || propagation.equals(Propagation.MANDATORY)) && !isTransactionActive && transactionContext != null) {
-            return MethodRole.PROVIDER;
+            return MethodRole.PROVIDER;//队列无事物，有事物上下文，则为PROVIDER
         } else {
             return MethodRole.NORMAL;
         }
     }
 
+    //执行真正的方法
     public Object proceed() throws Throwable {
         return this.pjp.proceed();
     }

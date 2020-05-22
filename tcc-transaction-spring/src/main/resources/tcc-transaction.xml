@@ -17,7 +17,7 @@
           init-method="init">
         <property name="transactionConfigurator" ref="transactionConfigurator"/>
     </bean>
-
+    <!-- 初始化compensable事物切面 -->
     <bean id="resourceCoordinatorAspect" class="org.mengyun.tcctransaction.spring.ConfigurableCoordinatorAspect"
           init-method="init">
         <property name="transactionConfigurator" ref="transactionConfigurator"/>

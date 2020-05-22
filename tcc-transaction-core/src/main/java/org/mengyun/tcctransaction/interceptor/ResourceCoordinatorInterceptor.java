@@ -17,7 +17,7 @@ import org.mengyun.tcctransaction.utils.ReflectionUtils;
 import java.lang.reflect.Method;
 
 /**
- * Created by changmingxie on 11/8/15.
+ * Created by changmingxie on 11/8/15.  资源调节拦截器
  */
 public class ResourceCoordinatorInterceptor {
 
@@ -30,12 +30,14 @@ public class ResourceCoordinatorInterceptor {
 
     public Object interceptTransactionContextMethod(ProceedingJoinPoint pjp) throws Throwable {
 
+        //获取当前第一个事物
         Transaction transaction = transactionManager.getCurrentTransaction();
 
         if (transaction != null) {
 
             switch (transaction.getStatus()) {
                 case TRYING:
+                    //为TRYING状态的，加入到参与者中
                     enlistParticipant(pjp);
                     break;
                 case CONFIRMING:
@@ -45,6 +47,7 @@ public class ResourceCoordinatorInterceptor {
             }
         }
 
+        //执行该方法
         return pjp.proceed(pjp.getArgs());
     }
 
@@ -56,6 +59,7 @@ public class ResourceCoordinatorInterceptor {
         }
         Compensable compensable = method.getAnnotation(Compensable.class);
 
+        //获取注解上的confirm方法和cancel方法
         String confirmMethodName = compensable.confirmMethod();
         String cancelMethodName = compensable.cancelMethod();
 

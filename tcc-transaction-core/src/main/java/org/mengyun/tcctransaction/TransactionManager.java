@@ -76,6 +76,7 @@ public class TransactionManager {
     //提交事物
     public void commit(boolean asyncCommit) {
 
+        //获取当前头节点事物
         final Transaction transaction = getCurrentTransaction();
 
         //事物状态更新为confirm
@@ -84,7 +85,7 @@ public class TransactionManager {
         //更新事物
         transactionRepository.update(transaction);
 
-        if (asyncCommit) {
+        if (asyncCommit) {//是否异步提交
             try {
                 Long statTime = System.currentTimeMillis();
 
@@ -100,15 +101,15 @@ public class TransactionManager {
                 throw new ConfirmingException(commitException);
             }
         } else {
-            commitTransaction(transaction);
+            commitTransaction(transaction);//提交事物
         }
     }
 
-
+    //回滚事物
     public void rollback(boolean asyncRollback) {
-
+        //获取当前头节点事物
         final Transaction transaction = getCurrentTransaction();
-        transaction.changeStatus(TransactionStatus.CANCELLING);
+        transaction.changeStatus(TransactionStatus.CANCELLING);//更新事物为取消状态3
 
         transactionRepository.update(transaction);
 
@@ -134,8 +135,8 @@ public class TransactionManager {
 
     private void commitTransaction(Transaction transaction) {
         try {
-            transaction.commit();
-            transactionRepository.delete(transaction);
+            transaction.commit();//事物提交，执行confirm方法
+            transactionRepository.delete(transaction);//删除事物
         } catch (Throwable commitException) {
             logger.warn("compensable transaction confirm failed, recovery job will try to confirm later.", commitException);
             throw new ConfirmingException(commitException);
@@ -144,8 +145,8 @@ public class TransactionManager {
 
     private void rollbackTransaction(Transaction transaction) {
         try {
-            transaction.rollback();
-            transactionRepository.delete(transaction);
+            transaction.rollback();//事物回滚，执行cancel方法
+            transactionRepository.delete(transaction);//删除事物
         } catch (Throwable rollbackException) {
             logger.warn("compensable transaction rollback failed, recovery job will try to rollback later.", rollbackException);
             throw new CancellingException(rollbackException);
@@ -176,6 +177,7 @@ public class TransactionManager {
         CURRENT.get().push(transaction);
     }
 
+    //事物完成之后进行清除
     public void cleanAfterCompletion(Transaction transaction) {
         if (isTransactionActive() && transaction != null) {
             Transaction currentTransaction = getCurrentTransaction();
@@ -190,6 +192,7 @@ public class TransactionManager {
         }
     }
 
+    //事物中添加参与者
     public void enlistParticipant(Participant participant) {
         Transaction transaction = this.getCurrentTransaction();
         transaction.enlistParticipant(participant);
