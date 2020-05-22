@@ -8,13 +8,13 @@ import java.io.Serializable;
 public class InvocationContext implements Serializable {
 
     private static final long serialVersionUID = -7969140711432461165L;
-    private Class targetClass;
+    private Class targetClass;//目标类
 
-    private String methodName;
+    private String methodName;//方法名
 
-    private Class[] parameterTypes;
+    private Class[] parameterTypes;//参数类型
 
-    private Object[] args;
+    private Object[] args;//参数
 
     public InvocationContext() {
 

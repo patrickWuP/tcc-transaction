@@ -21,23 +21,23 @@ public class Transaction implements Serializable {
 
     private static final long serialVersionUID = 7291423944314337931L;
 
-    private TransactionXid xid;
+    private TransactionXid xid;//事物id
 
-    private TransactionStatus status;
+    private TransactionStatus status;//事物状态
 
-    private TransactionType transactionType;
+    private TransactionType transactionType;//事物类型
 
-    private volatile int retriedCount = 0;
+    private volatile int retriedCount = 0;//检索次数
 
-    private Date createTime = new Date();
+    private Date createTime = new Date();//创建时间
 
-    private Date lastUpdateTime = new Date();
+    private Date lastUpdateTime = new Date();//上次更新时间
 
-    private long version = 1;
+    private long version = 1;//版本号
 
-    private List<Participant> participants = new ArrayList<Participant>();
+    private List<Participant> participants = new ArrayList<Participant>();//参与者集合
 
-    private Map<String, Object> attachments = new ConcurrentHashMap<String, Object>();
+    private Map<String, Object> attachments = new ConcurrentHashMap<String, Object>();//附件信息
 
     public Transaction() {
 
@@ -89,16 +89,18 @@ public class Transaction implements Serializable {
     }
 
 
+    //事物提交，依次提交
     public void commit() {
 
         for (Participant participant : participants) {
-            participant.commit();
+            participant.commit();//参与者提交
         }
     }
 
+    //事物回滚，依次回滚
     public void rollback() {
         for (Participant participant : participants) {
-            participant.rollback();
+            participant.rollback();//参与者回滚
         }
     }
 

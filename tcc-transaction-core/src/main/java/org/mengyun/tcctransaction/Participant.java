@@ -14,11 +14,11 @@ public class Participant implements Serializable {
 
     private static final long serialVersionUID = 4127729421281425247L;
 
-    private TransactionXid xid;
+    private TransactionXid xid;//事物id
 
-    private InvocationContext confirmInvocationContext;
+    private InvocationContext confirmInvocationContext;//确认方法上下文
 
-    private InvocationContext cancelInvocationContext;
+    private InvocationContext cancelInvocationContext;//取消方法上下文
 
     Class<? extends TransactionContextEditor> transactionContextEditorClass;
 

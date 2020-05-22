@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class SpringTransactionConfigurator implements TransactionConfigurator {
 
-    private static volatile ExecutorService executorService = null;
+    private static volatile ExecutorService executorService = null;//线程连接池
 
     @Autowired
     private TransactionRepository transactionRepository;
@@ -28,8 +28,8 @@ public class SpringTransactionConfigurator implements TransactionConfigurator {
     private TransactionManager transactionManager;
 
     public void init() {
-        transactionManager = new TransactionManager();
-        transactionManager.setTransactionRepository(transactionRepository);
+        transactionManager = new TransactionManager();//创建一个事物管理器
+        transactionManager.setTransactionRepository(transactionRepository);//设置事物的持久层
 
         if (executorService == null) {
 
@@ -38,18 +38,19 @@ public class SpringTransactionConfigurator implements TransactionConfigurator {
             synchronized (SpringTransactionConfigurator.class) {
 
                 if (executorService == null) {
+                    //初始化线程池
                     executorService = new ThreadPoolExecutor(
-                            recoverConfig.getAsyncTerminateThreadCorePoolSize(),
-                            recoverConfig.getAsyncTerminateThreadMaxPoolSize(),
-                            5L,
+                            recoverConfig.getAsyncTerminateThreadCorePoolSize(),//核心线程数
+                            recoverConfig.getAsyncTerminateThreadMaxPoolSize(),//最大线程数
+                            5L,//空闲线程最大存活时间为5s
                             TimeUnit.SECONDS,
-                            new ArrayBlockingQueue<Runnable>(recoverConfig.getAsyncTerminateThreadWorkQueueSize()),
+                            new ArrayBlockingQueue<Runnable>(recoverConfig.getAsyncTerminateThreadWorkQueueSize()),//设置阻塞队列及其长度
                             new ThreadFactory() {
 
-                                final AtomicInteger poolNumber = new AtomicInteger(1);
-                                final ThreadGroup group;
-                                final AtomicInteger threadNumber = new AtomicInteger(1);
-                                final String namePrefix;
+                                final AtomicInteger poolNumber = new AtomicInteger(1);//线程池大小
+                                final ThreadGroup group;//线程组
+                                final AtomicInteger threadNumber = new AtomicInteger(1);//线程数量
+                                final String namePrefix;//名称前缀
 
                                 {
                                     SecurityManager securityManager = System.getSecurityManager();
@@ -60,23 +61,24 @@ public class SpringTransactionConfigurator implements TransactionConfigurator {
                                 public Thread newThread(Runnable runnable) {
                                     Thread thread = new Thread(this.group, runnable, this.namePrefix + this.threadNumber.getAndIncrement(), 0L);
                                     if (thread.isDaemon()) {
-                                        thread.setDaemon(false);
+                                        thread.setDaemon(false);//设置为非守护线程
                                     }
 
                                     if (thread.getPriority() != 5) {
-                                        thread.setPriority(5);
+                                        thread.setPriority(5);//线程优先级设置为5
                                     }
 
                                     return thread;
                                 }
-                            },
-                            new ThreadPoolExecutor.CallerRunsPolicy());
+                            },//创建新线程用的工厂
+                            new ThreadPoolExecutor.CallerRunsPolicy());//线程池阻塞策略
                 }
             }
         }
 
         transactionManager.setExecutorService(executorService);
 
+        //如果是缓存的持久层，则设置过期时间
         if (transactionRepository instanceof CachableTransactionRepository) {
             ((CachableTransactionRepository) transactionRepository).setExpireDuration(recoverConfig.getRecoverDuration());
         }

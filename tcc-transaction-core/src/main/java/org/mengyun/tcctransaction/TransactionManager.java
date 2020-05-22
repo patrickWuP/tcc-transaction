@@ -17,9 +17,9 @@ public class TransactionManager {
 
     static final Logger logger = Logger.getLogger(TransactionManager.class.getSimpleName());
 
-    private TransactionRepository transactionRepository;
+    private TransactionRepository transactionRepository;//事物持久层
 
-    private static final ThreadLocal<Deque<Transaction>> CURRENT = new ThreadLocal<Deque<Transaction>>();
+    private static final ThreadLocal<Deque<Transaction>> CURRENT = new ThreadLocal<Deque<Transaction>>();//本线程的双端队列事物集合
 
     private ExecutorService executorService;
 
@@ -36,10 +36,11 @@ public class TransactionManager {
 
     }
 
+    //开始一个事物
     public Transaction begin(Object uniqueIdentify) {
         Transaction transaction = new Transaction(uniqueIdentify,TransactionType.ROOT);
-        transactionRepository.create(transaction);
-        registerTransaction(transaction);
+        transactionRepository.create(transaction);//创建事物
+        registerTransaction(transaction);//往当前ThreadLocal添加该事物
         return transaction;
     }
 
@@ -50,15 +51,16 @@ public class TransactionManager {
         return transaction;
     }
 
+    //根据事物上下文，传播新的事物，新的事物类型为BRANCH
     public Transaction propagationNewBegin(TransactionContext transactionContext) {
 
         Transaction transaction = new Transaction(transactionContext);
         transactionRepository.create(transaction);
-
         registerTransaction(transaction);
         return transaction;
     }
 
+    //根绝事物上下文，用已存在的事物进行传播新的事物
     public Transaction propagationExistBegin(TransactionContext transactionContext) throws NoExistedTransactionException {
         Transaction transaction = transactionRepository.findByXid(transactionContext.getXid());
 
@@ -71,12 +73,15 @@ public class TransactionManager {
         }
     }
 
+    //提交事物
     public void commit(boolean asyncCommit) {
 
         final Transaction transaction = getCurrentTransaction();
 
+        //事物状态更新为confirm
         transaction.changeStatus(TransactionStatus.CONFIRMING);
 
+        //更新事物
         transactionRepository.update(transaction);
 
         if (asyncCommit) {
@@ -149,17 +154,19 @@ public class TransactionManager {
 
     public Transaction getCurrentTransaction() {
         if (isTransactionActive()) {
-            return CURRENT.get().peek();
+            return CURRENT.get().peek();//获取第一个节点
         }
         return null;
     }
 
+    //当前线程队列是否保存着事物
     public boolean isTransactionActive() {
         Deque<Transaction> transactions = CURRENT.get();
         return transactions != null && !transactions.isEmpty();
     }
 
 
+    //往当前线程队列中添加事物
     private void registerTransaction(Transaction transaction) {
 
         if (CURRENT.get() == null) {

@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by changmingxie on 10/30/15.
+ * Created by changmingxie on 10/30/15. 缓存持久层的抽象类
  */
 public abstract class CachableTransactionRepository implements TransactionRepository {
 

@@ -7,19 +7,19 @@ import java.util.Set;
  */
 public interface RecoverConfig {
 
-    public int getMaxRetryCount();
+    public int getMaxRetryCount();//最大重试次数
 
-    public int getRecoverDuration();
+    public int getRecoverDuration();//获取恢复操作持续时间
 
-    public String getCronExpression();
+    public String getCronExpression();//获取cron表达式
 
     public Set<Class<? extends Exception>> getDelayCancelExceptions();
 
     public void setDelayCancelExceptions(Set<Class<? extends Exception>> delayRecoverExceptions);
 
-    public int getAsyncTerminateThreadCorePoolSize();
+    public int getAsyncTerminateThreadCorePoolSize();//获取异步核心线程数量
 
-    public int getAsyncTerminateThreadMaxPoolSize();
+    public int getAsyncTerminateThreadMaxPoolSize();//获取异步线程最大数量
 
-    public int getAsyncTerminateThreadWorkQueueSize();
+    public int getAsyncTerminateThreadWorkQueueSize();//获取线程工作队列大小
 }

@@ -10,11 +10,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TransactionContext implements Serializable {
 
     private static final long serialVersionUID = -8199390103169700387L;
-    private TransactionXid xid;
+    private TransactionXid xid;//id
 
-    private int status;
+    private int status;//状态
 
-    private Map<String, String> attachments = new ConcurrentHashMap<String, String>();
+    private Map<String, String> attachments = new ConcurrentHashMap<String, String>();//附件信息
 
     public TransactionContext() {
 

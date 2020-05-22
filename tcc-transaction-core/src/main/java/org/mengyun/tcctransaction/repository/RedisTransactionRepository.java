@@ -119,8 +119,8 @@ public class RedisTransactionRepository extends CachableTransactionRepository {
                 @Override
                 public Long doInJedis(Jedis jedis) {
 
-                    transaction.updateTime();
-                    transaction.updateVersion();
+                    transaction.updateTime();//更新事物修改时间
+                    transaction.updateVersion();//更新事物版本，版本自增
 
                     List<byte[]> params = new ArrayList<byte[]>();
 

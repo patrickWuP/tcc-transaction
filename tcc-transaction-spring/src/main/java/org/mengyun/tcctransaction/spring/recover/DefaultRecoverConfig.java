@@ -8,23 +8,23 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Created by changming.xie on 6/1/16.
+ * Created by changming.xie on 6/1/16.  默认恢复操作配置
  */
 public class DefaultRecoverConfig implements RecoverConfig {
 
     public static final RecoverConfig INSTANCE = new DefaultRecoverConfig();
 
-    private int maxRetryCount = 30;
+    private int maxRetryCount = 30;//最大重试30次
 
     private int recoverDuration = 120; //120 seconds
 
-    private String cronExpression = "0 */1 * * * ?";
+    private String cronExpression = "0 */1 * * * ?";//默认一分钟执行一次
 
-    private int asyncTerminateThreadCorePoolSize = 512;
+    private int asyncTerminateThreadCorePoolSize = 512;//核心线程数量512
 
-    private int asyncTerminateThreadMaxPoolSize = 1024;
+    private int asyncTerminateThreadMaxPoolSize = 1024;//最大线程数量1024
 
-    private int asyncTerminateThreadWorkQueueSize = 512;
+    private int asyncTerminateThreadWorkQueueSize = 512;//工作队列数量512
 
     private Set<Class<? extends Exception>> delayCancelExceptions = new HashSet<Class<? extends Exception>>();
 

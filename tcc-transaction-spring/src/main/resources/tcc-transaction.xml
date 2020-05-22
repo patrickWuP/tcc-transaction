@@ -8,10 +8,11 @@
 
     <bean id="springBeanFactory" class="org.mengyun.tcctransaction.spring.support.SpringBeanFactory"/>
 
-
+    <!-- 初始化事物相关配置，recoverConfig，transactionManager，executorService -->
     <bean id="transactionConfigurator" class="org.mengyun.tcctransaction.spring.support.SpringTransactionConfigurator"
           init-method="init"/>
 
+    <!-- 初始化compensable事物切面 -->
     <bean id="compensableTransactionAspect" class="org.mengyun.tcctransaction.spring.ConfigurableTransactionAspect"
           init-method="init">
         <property name="transactionConfigurator" ref="transactionConfigurator"/>
@@ -24,13 +25,14 @@
 
     <task:annotation-driven/>
 
-
+    <!-- 具体执行恢复事物的逻辑 -->
     <bean id="transactionRecovery" class="org.mengyun.tcctransaction.recover.TransactionRecovery">
         <property name="transactionConfigurator" ref="transactionConfigurator"/>
     </bean>
 
     <bean id="recoverScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean"/>
 
+    <!-- 初始化恢复计划任务 -->
     <bean id="recoverScheduledJob" class="org.mengyun.tcctransaction.spring.recover.RecoverScheduledJob"
           init-method="init">
         <property name="transactionRecovery" ref="transactionRecovery"/>
